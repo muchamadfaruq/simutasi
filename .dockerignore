@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log*
+data
+.env
+.git
+.gitignore
+.smoketest
+*.md
+Dockerfile
+docker-compose*.yml
+Caddyfile
+.dockerignore

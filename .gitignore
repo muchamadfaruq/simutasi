@@ -1,0 +1,39 @@
+# ==========================================================
+#  Berkas yang TIDAK boleh ikut ke repositori
+# ==========================================================
+
+# Dependensi
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Rahasia — jangan pernah di-commit
+.env
+.env.local
+.env.*.local
+
+# Data aplikasi: basis data SQLite, lampiran, dan cadangan
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+backup/
+*.tar.gz
+*.zip
+
+# Berkas lampiran hasil unggahan (bila ada di luar folder data)
+uploads/
+files/
+
+# Berkas sementara pengujian
+.smoketest/node_modules/
+
+# Berkas sistem & editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.idea/
+.vscode/

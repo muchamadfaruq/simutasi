@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: simutasi:latest
+    container_name: simutasi-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DATA_DIR: /data
+      TRUST_PROXY: "true"
+    volumes:
+      - simutasi-data:/data
+    expose:
+      - "3000"
+    networks:
+      - simutasi
+    security_opt:
+      - no-new-privileges:true
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: simutasi-caddy
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Nilai cadangan dipakai bila dikosongkan pada .env,
+      # agar berkas Caddyfile selalu valid.
+      DOMAIN: ${DOMAIN:-:8080}
+      ACME_EMAIL: ${ACME_EMAIL:-webmaster@localhost}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${ALT_PORT:-8080}:8080"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+    networks:
+      - simutasi
+
+volumes:
+  # Nama volume dikunci agar perintah backup/restore pada DEPLOY.md
+  # selalu sama, meskipun nama folder proyek berbeda.
+  simutasi-data:
+    name: simutasi-data
+  caddy-data:
+    name: simutasi-caddy-data
+  caddy-config:
+    name: simutasi-caddy-config
+
+networks:
+  simutasi:
+    driver: bridge

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Login Admin &mdash; SIMUTASI</title>
+<link rel="stylesheet" href="assets/landing.css">
+<style>
+  body { background: #f5f8f6; }
+  .login-wrap {
+    min-height: 100vh; display: grid; grid-template-columns: 1.05fr .95fr;
+  }
+  .login-aside {
+    position: relative; overflow: hidden; color: #eaf7f1; padding: 46px;
+    background:
+      radial-gradient(760px 340px at 84% 4%, rgba(90,214,165,.28), transparent 62%),
+      linear-gradient(160deg, #06251a, #0f3d2e 55%, #0b3527);
+    display: flex; flex-direction: column;
+  }
+  .login-aside::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(65% 55% at 45% 35%, #000, transparent 80%);
+  }
+  .login-aside > * { position: relative; z-index: 2; }
+  .aside-brand { display: flex; align-items: center; gap: 13px; }
+  .aside-brand .brand-logo { background: rgba(255,255,255,.13); color: #fff; border: 1px solid rgba(255,255,255,.22); }
+  .aside-brand strong { color: #fff; font-size: 15px; }
+  .aside-brand span { display: block; font-size: 11.5px; color: #9dc6b6; }
+  .login-aside h1 { font-size: 32px; font-weight: 750; color: #fff; margin-top: auto; }
+  .login-aside p { color: #b9dccd; font-size: 14.5px; margin-top: 12px; max-width: 460px; }
+  .aside-list { margin: 26px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .aside-list li { display: flex; gap: 10px; font-size: 13.5px; color: #d3ece0; }
+  .aside-list svg { width: 17px; height: 17px; flex: 0 0 17px; color: #7fe3b8; margin-top: 3px; }
+  .login-main { display: grid; place-items: center; padding: 40px 24px; }
+  .login-card { width: 100%; max-width: 400px; }
+  .login-card h2 { font-size: 24px; }
+  .login-card > p.sub { color: var(--ink-500); font-size: 13.5px; margin-top: 7px; }
+  form.login-form { margin-top: 26px; display: flex; flex-direction: column; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12.5px; font-weight: 650; color: var(--ink-700); }
+  .field input {
+    width: 100%; padding: 11px 13px; font-size: 14px; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 10px; background: #fff; outline: none; transition: .15s;
+  }
+  .field input:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(35,152,110,.14); }
+  .alert {
+    display: none; align-items: flex-start; gap: 9px; padding: 11px 13px; border-radius: 10px;
+    background: #fdecea; color: #a5301f; font-size: 13px; border: 1px solid #f7cfc9;
+  }
+  .alert.show { display: flex; }
+  .alert svg { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 1px; }
+  .btn-block { width: 100%; padding: 12px 18px; font-size: 14px; }
+  .login-foot { margin-top: 22px; font-size: 12.5px; color: var(--ink-500); text-align: center; }
+  .login-foot a { color: var(--green-700); text-decoration: none; font-weight: 600; }
+  .spinner {
+    width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.45);
+    border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (max-width: 900px) {
+    .login-wrap { grid-template-columns: 1fr; }
+    .login-aside { padding: 30px 24px; min-height: 240px; }
+    .login-aside h1 { font-size: 24px; margin-top: 22px; }
+    .aside-list { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-wrap">
+  <aside class="login-aside">
+    <div class="aside-brand">
+      <div class="brand-logo" id="brandLogo">SM</div>
+      <div>
+        <strong id="brandName">SMA Negeri 2 Mengwi</strong>
+        <span>SIMUTASI &middot; Sistem Informasi Mutasi Siswa</span>
+      </div>
+    </div>
+    <h1>Masuk sebagai petugas sekolah</h1>
+    <p>Kelola data mutasi masuk dan keluar, unggah berkas persyaratan, serta cetak surat keterangan mutasi siswa.</p>
+    <ul class="aside-list">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>Pencatatan mutasi masuk &amp; keluar</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>Arsip digital surat persyaratan siswa</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>Cetak surat keterangan dan rekap mutasi</span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg><span>Impor dan ekspor data ke Excel</span></li>
+    </ul>
+  </aside>
+
+  <main class="login-main">
+    <div class="login-card">
+      <h2>Login Admin</h2>
+      <p class="sub">Gunakan akun yang diberikan oleh administrator sekolah.</p>
+
+      <div class="alert" id="alertBox">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        <span id="alertText">Nama pengguna atau sandi salah.</span>
+      </div>
+
+      <form class="login-form" id="loginForm" autocomplete="on">
+        <div class="field">
+          <label for="username">Nama Pengguna</label>
+          <input id="username" name="username" autocomplete="username" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Sandi</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="btnLogin">
+          <span id="btnLoginText">Masuk</span>
+        </button>
+      </form>
+
+      <p class="login-foot"><a href="/">&larr; Kembali ke halaman prosedur mutasi</a></p>
+    </div>
+  </main>
+</div>
+
+<script src="assets/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Normalisasi akhir baris: simpan sebagai LF di repositori
+* text=auto
+
+# Berkas biner - jangan diubah git
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.xlsx binary
+*.xls binary
+*.db binary
+*.zip binary
+*.gz binary

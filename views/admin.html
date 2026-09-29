@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Dashboard &mdash; SIMUTASI</title>
+<link rel="stylesheet" href="/assets/admin.css">
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo" id="brandLogo">SM</div>
+      <div class="brand-text">
+        <strong>SIMUTASI</strong>
+        <span id="brandSchool">Memuat…</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Menu Utama</div>
+      <button class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="masuk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
+        Mutasi Masuk
+        <span class="count" id="cntMasuk">0</span>
+      </button>
+      <button class="nav-item" data-view="keluar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        Mutasi Keluar
+        <span class="count" id="cntKeluar">0</span>
+      </button>
+      <div class="nav-label">Dokumen</div>
+      <button class="nav-item" data-view="arsip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Arsip Surat
+        <span class="count" id="cntArsip">0</span>
+      </button>
+      <div class="nav-label">Sistem</div>
+      <button class="nav-item" data-view="pengaturan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6 1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Pengaturan
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div id="footerTA">Tahun Ajaran &mdash;</div>
+      <a href="/" target="_blank" rel="noopener" class="sidebar-link">Lihat halaman publik &rarr;</a>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <header class="topbar">
+      <button class="btn btn-icon" id="menuToggle" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="topbar-sub" id="pageSub">Ringkasan perpindahan siswa</div>
+      </div>
+      <div class="topbar-actions">
+        <select id="filterTA" title="Tahun ajaran"></select>
+        <button class="btn btn-ghost" id="btnImport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Import
+        </button>
+        <button class="btn btn-ghost" id="btnExport">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary" id="btnAdd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+          <span id="btnAddLabel">Tambah Mutasi</span>
+        </button>
+
+        <div class="user-menu">
+          <button class="user-btn" id="userBtn">
+            <span class="avatar" id="userAvatar">A</span>
+            <span class="user-meta"><b id="userName">—</b><i id="userRole">—</i></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="user-panel hidden" id="userPanel">
+            <div class="user-panel-head">
+              <b id="userPanelName">—</b>
+              <span id="userPanelRole">—</span>
+            </div>
+            <button data-menu="password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Ganti Sandi
+            </button>
+            <button data-menu="logout" class="danger">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+              Keluar
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="view" id="view-dashboard">
+        <div class="stat-grid">
+          <div class="stat in">
+            <div class="stat-label">Mutasi Masuk</div>
+            <div class="stat-value" id="statMasuk">0</div>
+            <div class="stat-hint" id="statMasukHint">&nbsp;</div>
+          </div>
+          <div class="stat out">
+            <div class="stat-label">Mutasi Keluar</div>
+            <div class="stat-value" id="statKeluar">0</div>
+            <div class="stat-hint" id="statKeluarHint">&nbsp;</div>
+          </div>
+          <div class="stat net">
+            <div class="stat-label">Selisih (Net)</div>
+            <div class="stat-value" id="statNet">0</div>
+            <div class="stat-hint">Masuk &minus; keluar</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Arsip Surat</div>
+            <div class="stat-value" id="statArsip">0</div>
+            <div class="stat-hint">Berkas lampiran tersimpan</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <h3>Rekap per Bulan</h3>
+              <div class="spacer"></div>
+              <div class="legend"><span><i class="in"></i>Masuk</span><span><i class="out"></i>Keluar</span></div>
+            </div>
+            <div class="card-body"><div class="chart" id="chartBulan"></div></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Alasan Mutasi Terbanyak</h3></div>
+            <div class="card-body"><div class="bar-list" id="chartAlasan"></div></div>
+          </div>
+        </div>
+
+        <div class="grid-2 even">
+          <div class="card">
+            <div class="card-head"><h3>Sebaran per Kelas</h3></div>
+            <div class="card-body"><div class="bar-list" id="chartKelas"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <h3>Aktivitas Terbaru</h3>
+              <div class="spacer"></div>
+              <button class="btn btn-ghost btn-sm" data-goto="masuk">Lihat semua</button>
+            </div>
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>Jenis</th><th>Nama</th><th>Tanggal</th></tr></thead>
+                <tbody id="recentBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MUTASI MASUK ===== -->
+      <section class="view hidden" id="view-masuk">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="qMasuk" placeholder="Cari nama, NISN, asal sekolah...">
+          </div>
+          <select id="fKelasMasuk"><option value="">Semua kelas</option></select>
+          <select id="fAlasanMasuk"><option value="">Semua alasan</option></select>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost btn-sm" data-print="masuk">Cetak Rekap</button>
+          <button class="btn btn-primary btn-sm" data-add="masuk">+ Tambah Masuk</button>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Daftar Mutasi Masuk</h3>
+            <div class="spacer"></div>
+            <span class="badge blue" id="infoMasuk">0 siswa</span>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th style="width:38px">#</th>
+                  <th>Tanggal</th>
+                  <th>No. Surat</th>
+                  <th>Nama / NISN</th>
+                  <th>L/P</th>
+                  <th>Kelas</th>
+                  <th>Asal Sekolah</th>
+                  <th>Alasan</th>
+                  <th>Lampiran</th>
+                  <th style="width:150px"></th>
+                </tr>
+              </thead>
+              <tbody id="bodyMasuk"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MUTASI KELUAR ===== -->
+      <section class="view hidden" id="view-keluar">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="qKeluar" placeholder="Cari nama, NISN, sekolah tujuan...">
+          </div>
+          <select id="fKelasKeluar"><option value="">Semua kelas</option></select>
+          <select id="fAlasanKeluar"><option value="">Semua alasan</option></select>
+          <div class="spacer"></div>
+          <button class="btn btn-ghost btn-sm" data-print="keluar">Cetak Rekap</button>
+          <button class="btn btn-primary btn-sm" data-add="keluar">+ Tambah Keluar</button>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Daftar Mutasi Keluar</h3>
+            <div class="spacer"></div>
+            <span class="badge amber" id="infoKeluar">0 siswa</span>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th style="width:38px">#</th>
+                  <th>Tanggal</th>
+                  <th>No. Surat</th>
+                  <th>Nama / NISN</th>
+                  <th>L/P</th>
+                  <th>Kelas</th>
+                  <th>Sekolah Tujuan</th>
+                  <th>Alasan</th>
+                  <th>Lampiran</th>
+                  <th style="width:150px"></th>
+                </tr>
+              </thead>
+              <tbody id="bodyKeluar"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ARSIP SURAT ===== -->
+      <section class="view hidden" id="view-arsip">
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="qArsip" placeholder="Cari nama berkas atau siswa...">
+          </div>
+          <div class="spacer"></div>
+          <span class="badge" id="infoArsip">0 berkas</span>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Arsip Berkas Persyaratan Mutasi</h3></div>
+          <div class="arsip-list" id="arsipList"></div>
+        </div>
+      </section>
+
+      <!-- ===== PENGATURAN ===== -->
+      <section class="view hidden" id="view-pengaturan">
+        <div class="set-tabs">
+          <button class="set-tab active" data-set="identitas">Identitas Sekolah</button>
+          <button class="set-tab" data-set="prosedur">Prosedur Mutasi</button>
+          <button class="set-tab" data-set="referensi">Referensi</button>
+          <button class="set-tab admin-only" data-set="pengguna">Pengguna</button>
+          <button class="set-tab admin-only" data-set="log">Log Aktivitas</button>
+          <button class="set-tab admin-only" data-set="data">Data &amp; Cadangan</button>
+        </div>
+
+        <!-- Identitas -->
+        <div class="card set-panel" id="set-identitas">
+          <div class="card-head"><h3>Identitas Sekolah &amp; Kop Surat</h3><div class="spacer"></div><span class="badge gray" id="identitasHint">Dipakai pada kop surat</span></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="s_namaSekolah">Nama Sekolah <span class="req">*</span></label>
+                <input id="s_namaSekolah">
+                <span class="hint">Dicetak besar (tebal) di tengah kop, dan dipakai di seluruh aplikasi.</span>
+              </div>
+
+              <div class="section-title" style="grid-column:1/-1">Kop Surat</div>
+              <div class="field full">
+                <label>Jenis Kop Surat</label>
+                <div class="kop-mode">
+                  <label class="kop-mode-opt">
+                    <input type="radio" name="kopMode" id="kopModeGambar" value="gambar">
+                    <span><b>Gambar kop surat (unggahan)</b><i>Unggah berkas gambar kop yang sudah jadi, lalu dicetak apa adanya.</i></span>
+                  </label>
+                  <label class="kop-mode-opt">
+                    <input type="radio" name="kopMode" id="kopModeTeks" value="teks">
+                    <span><b>Susun dari teks</b><i>Kop dibuat dari baris teks dan logo di bawah ini.</i></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="field full" id="kopPanelGambar">
+                <label for="s_kopGambar">Berkas Gambar Kop Surat</label>
+                <div class="kop-upload">
+                  <div class="kop-thumb" id="kopGambarPreview">
+                    <span>belum ada gambar</span>
+                  </div>
+                  <div class="kop-upload-side">
+                    <input type="file" id="s_kopGambar" accept="image/png,image/jpeg,image/webp">
+                    <span class="hint">PNG atau JPG, maksimal 3 MB. Disarankan lebar minimal 1500 px agar tajam saat dicetak (ukuran berkas ± 300&ndash;500 KB sudah cukup).</span>
+                    <button type="button" class="btn btn-ghost btn-sm" id="btnKopGambarRemove">Hapus gambar kop</button>
+                  </div>
+                </div>
+                <label class="check-inline">
+                  <input type="checkbox" id="s_kopGaris">
+                  <span>Tambahkan garis ganda di bawah kop surat (bila gambarnya belum memuat garis)</span>
+                </label>
+              </div>
+
+              <div class="field full" id="kopPanelTeks">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="s_kopBarisAtas">Baris Atas Kop</label>
+                    <textarea id="s_kopBarisAtas" rows="3" spellcheck="false" placeholder="satu baris per baris"></textarea>
+                    <span class="hint">Dicetak kecil di atas nama sekolah. Contoh: <i>PEMERINTAH PROVINSI BALI</i>.</span>
+                  </div>
+                  <div class="field">
+                    <label for="s_kopBarisBawah">Baris Bawah Kop</label>
+                    <textarea id="s_kopBarisBawah" rows="3" spellcheck="false" placeholder="satu baris per baris"></textarea>
+                    <span class="hint">Dicetak kecil di bawah nama sekolah (alamat, telepon, surel).</span>
+                  </div>
+                  <div class="field">
+                    <label for="s_logo">Logo Kiri Kop</label>
+                    <div class="logo-row">
+                      <div class="arsip-ico" id="logoPreview" style="width:52px;height:52px;flex:0 0 52px;font-size:12px">SM</div>
+                      <input type="file" id="s_logo" accept="image/png,image/jpeg,image/svg+xml,image/webp">
+                      <button type="button" class="btn btn-ghost btn-sm" id="btnLogoRemove">Hapus</button>
+                    </div>
+                    <span class="hint">Tampil di kop kiri dan sidebar. Maks. 500 KB.</span>
+                  </div>
+                  <div class="field">
+                    <label for="s_logoKanan">Logo Kanan Kop (opsional)</label>
+                    <div class="logo-row">
+                      <div class="arsip-ico" id="logoKananPreview" style="width:52px;height:52px;flex:0 0 52px;font-size:12px">—</div>
+                      <input type="file" id="s_logoKanan" accept="image/png,image/jpeg,image/svg+xml,image/webp">
+                      <button type="button" class="btn btn-ghost btn-sm" id="btnLogoKananRemove">Hapus</button>
+                    </div>
+                    <span class="hint">Mis. lambang provinsi, bila kop memakai dua logo.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field full">
+                <div class="kop-preview-wrap">
+                  <div class="kop-preview-label">Pratinjau Kop Surat</div>
+                  <div class="kop-preview surat" id="kopPreview"></div>
+                </div>
+              </div>
+
+              <div class="section-title" style="grid-column:1/-1">Data Sekolah Lainnya</div>
+              <div class="field full">
+                <label for="s_alamatSekolah">Alamat Sekolah</label>
+                <input id="s_alamatSekolah">
+                <span class="hint">Tampil pada halaman publik. Untuk kop surat, gunakan <b>Baris Bawah Kop</b> di atas.</span>
+              </div>
+              <div class="field">
+                <label for="s_telepon">Telepon</label>
+                <input id="s_telepon">
+              </div>
+              <div class="field">
+                <label for="s_email">Surel</label>
+                <input id="s_email">
+              </div>
+              <div class="field full">
+                <label for="s_website">Situs Web (opsional)</label>
+                <input id="s_website">
+              </div>
+              <div class="field full">
+                <label for="s_kotaTandaTangan">Kota Tanda Tangan</label>
+                <input id="s_kotaTandaTangan">
+              </div>
+              <div class="field full">
+                <label for="s_kepsek">Nama Kepala Sekolah</label>
+                <input id="s_kepsek">
+              </div>
+              <div class="field">
+                <label for="s_pangkatKepsek">Pangkat / Golongan</label>
+                <input id="s_pangkatKepsek">
+              </div>
+              <div class="field">
+                <label for="s_nipKepsek">NIP Kepala Sekolah</label>
+                <input id="s_nipKepsek">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prosedur -->
+        <div class="card set-panel hidden" id="set-prosedur">
+          <div class="card-head">
+            <h3>Prosedur Mutasi (Halaman Publik)</h3>
+            <div class="spacer"></div>
+            <a class="btn btn-ghost btn-sm" href="/" target="_blank" rel="noopener">Lihat halaman publik</a>
+          </div>
+          <div class="card-body">
+            <div class="section-title">Prosedur Mutasi Masuk</div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="p_masuk_judul">Judul</label>
+                <input id="p_masuk_judul">
+              </div>
+              <div class="field">
+                <label for="p_masuk_ringkas">Ringkasan</label>
+                <input id="p_masuk_ringkas">
+              </div>
+              <div class="field full">
+                <label for="p_masuk_langkah">Tahapan (satu tahap per baris: <b>Judul | Penjelasan</b>)</label>
+                <textarea id="p_masuk_langkah" rows="8" spellcheck="false"></textarea>
+              </div>
+              <div class="field full">
+                <label for="p_masuk_dokumen">Dokumen Persyaratan (satu per baris)</label>
+                <textarea id="p_masuk_dokumen" rows="6" spellcheck="false"></textarea>
+              </div>
+            </div>
+
+            <div class="section-title">Prosedur Mutasi Keluar</div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="p_keluar_judul">Judul</label>
+                <input id="p_keluar_judul">
+              </div>
+              <div class="field">
+                <label for="p_keluar_ringkas">Ringkasan</label>
+                <input id="p_keluar_ringkas">
+              </div>
+              <div class="field full">
+                <label for="p_keluar_langkah">Tahapan (satu tahap per baris: <b>Judul | Penjelasan</b>)</label>
+                <textarea id="p_keluar_langkah" rows="8" spellcheck="false"></textarea>
+              </div>
+              <div class="field full">
+                <label for="p_keluar_dokumen">Dokumen Persyaratan (satu per baris)</label>
+                <textarea id="p_keluar_dokumen" rows="6" spellcheck="false"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Referensi -->
+        <div class="card set-panel hidden" id="set-referensi">
+          <div class="card-head"><h3>Referensi &amp; Tahun Ajaran</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="s_tahunAjaranAktif">Tahun Ajaran Aktif</label>
+                <input id="s_tahunAjaranAktif" placeholder="2026/2027">
+                <span class="hint">Data baru otomatis memakai tahun ajaran ini.</span>
+              </div>
+              <div class="field full">
+                <label for="s_daftarKelas">Daftar Kelas (satu per baris)</label>
+                <textarea id="s_daftarKelas" spellcheck="false"></textarea>
+              </div>
+              <div class="field full">
+                <label for="s_daftarAlasan">Daftar Alasan Mutasi (satu per baris)</label>
+                <textarea id="s_daftarAlasan" spellcheck="false"></textarea>
+              </div>
+            </div>
+            <div class="referensi-info" id="referensiInfo"></div>
+          </div>
+        </div>
+
+        <!-- Pengguna -->
+        <div class="card set-panel hidden admin-only" id="set-pengguna">
+          <div class="card-head">
+            <h3>Kelola Pengguna</h3>
+            <div class="spacer"></div>
+            <button class="btn btn-primary btn-sm" id="btnAddUser">+ Tambah Pengguna</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Nama Pengguna</th><th>Nama</th><th>Peran</th><th>Status</th><th>Dibuat</th><th style="width:110px"></th></tr></thead>
+              <tbody id="bodyUsers"></tbody>
+            </table>
+          </div>
+          <div class="card-body" style="border-top:1px solid var(--line)">
+            <p class="hint" style="font-size:12.5px;color:var(--ink-500)">
+              <b>Admin</b> dapat mengelola pengguna dan pengaturan. <b>Operator</b> hanya dapat mengelola data mutasi dan berkas.
+            </p>
+          </div>
+        </div>
+
+        <!-- Log -->
+        <div class="card set-panel hidden admin-only" id="set-log">
+          <div class="card-head">
+            <h3>Log Aktivitas</h3>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost btn-sm" id="btnRefreshAudit">Muat Ulang</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Waktu</th><th>Pengguna</th><th>Aktivitas</th><th>Keterangan</th></tr></thead>
+              <tbody id="bodyAudit"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Data -->
+        <div class="card set-panel hidden admin-only" id="set-data">
+          <div class="card-head"><h3>Data &amp; Cadangan</h3></div>
+          <div class="card-body">
+            <div class="data-actions">
+              <button class="btn btn-ghost btn-sm" id="btnDump">Unduh Cadangan (JSON)</button>
+              <button class="btn btn-ghost btn-sm" id="btnRestore">Pulihkan Cadangan</button>
+              <button class="btn btn-danger btn-sm" id="btnPurge">Hapus Semua Data Mutasi</button>
+            </div>
+            <p class="hint" style="margin-top:12px;font-size:12.5px;color:var(--ink-500)">
+              Cadangan JSON memuat seluruh data mutasi, pengaturan sekolah, dan prosedur.
+              Berkas lampiran tidak termasuk — simpan berkas aslinya secara terpisah atau cadangkan
+              volume Docker (lihat <b>DEPLOY.md</b>).
+            </p>
+          </div>
+        </div>
+
+        <div class="save-bar" id="saveBar">
+          <button class="btn btn-primary" id="btnSaveSettings">Simpan Pengaturan</button>
+          <span class="hint" style="font-size:12px;color:var(--ink-500)">Perubahan langsung berlaku di aplikasi dan halaman publik.</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ============ MODAL: FORM RECORD ============ -->
+<div class="modal-backdrop hidden" id="modalForm">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div>
+        <h3 id="formTitle">Tambah Mutasi</h3>
+        <p id="formSub">Lengkapi data siswa yang berpindah</p>
+      </div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <form id="recordForm" novalidate>
+      <div class="modal-body">
+        <div class="section-title">Data Pribadi Siswa</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="f_nama">Nama Lengkap <span class="req">*</span></label>
+            <input id="f_nama" autocomplete="off">
+            <span class="err">Nama wajib diisi.</span>
+          </div>
+          <div class="field">
+            <label for="f_jenisKelamin">Jenis Kelamin <span class="req">*</span></label>
+            <select id="f_jenisKelamin">
+              <option value="">- pilih -</option>
+              <option value="L">Laki-laki (L)</option>
+              <option value="P">Perempuan (P)</option>
+            </select>
+            <span class="err">Pilih jenis kelamin.</span>
+          </div>
+          <div class="field">
+            <label for="f_nisn">NISN <span class="req">*</span></label>
+            <input id="f_nisn" inputmode="numeric" maxlength="10" autocomplete="off">
+            <span class="hint">10 digit angka.</span>
+            <span class="err">NISN harus 10 digit angka.</span>
+          </div>
+          <div class="field">
+            <label for="f_nis">NIS</label>
+            <input id="f_nis" inputmode="numeric" autocomplete="off">
+            <span class="hint">Opsional (boleh dikosongkan).</span>
+            <span class="err">NIS harus berupa angka.</span>
+          </div>
+          <div class="field">
+            <label for="f_tempatLahir">Tempat Lahir</label>
+            <input id="f_tempatLahir" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="f_tanggalLahir">Tanggal Lahir</label>
+            <input id="f_tanggalLahir" type="date">
+          </div>
+          <div class="field full">
+            <label for="f_namaOrtu">Nama Orang Tua / Wali</label>
+            <input id="f_namaOrtu" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="section-title">Data Mutasi</div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="f_tanggal">Tanggal Mutasi <span class="req">*</span></label>
+            <input id="f_tanggal" type="date">
+            <span class="err">Tanggal mutasi wajib diisi.</span>
+          </div>
+          <div class="field">
+            <label for="f_nomorSurat">Nomor Surat</label>
+            <input id="f_nomorSurat" autocomplete="off" maxlength="80" placeholder="mis. 421.3/123/SMAN2MGW/2026">
+            <span class="hint">Diketik manual, boleh dikosongkan dulu.</span>
+            <span class="err">Nomor surat maksimal 80 karakter.</span>
+          </div>
+          <div class="field">
+            <label for="f_kelas">Kelas <span class="req">*</span></label>
+            <input id="f_kelas" list="listKelas" autocomplete="off" placeholder="mis. XI A1">
+            <span class="err">Kelas wajib diisi.</span>
+          </div>
+          <div class="field">
+            <label for="f_alasan">Alasan Mutasi <span class="req">*</span></label>
+            <input id="f_alasan" list="listAlasan" autocomplete="off">
+            <span class="err">Alasan wajib diisi.</span>
+          </div>
+          <div class="field full">
+            <label for="f_sekolahLawan" id="labelSekolahLawan">Asal Sekolah <span class="req">*</span></label>
+            <input id="f_sekolahLawan" autocomplete="off" placeholder="mis. SMA Negeri 1 Contoh">
+            <span class="err">Kolom ini wajib diisi.</span>
+          </div>
+          <div class="field">
+            <label for="f_tahunAjaran">Tahun Ajaran <span class="req">*</span></label>
+            <input id="f_tahunAjaran" placeholder="2026/2027">
+            <span class="err">Tahun ajaran wajib diisi.</span>
+          </div>
+          <div class="field">
+            <label for="f_keterangan">Keterangan</label>
+            <input id="f_keterangan" placeholder="Catatan tambahan (opsional)">
+          </div>
+        </div>
+
+        <div class="section-title">Lampiran Berkas</div>
+        <div class="field full">
+          <label for="f_files">Unggah Surat / Berkas (PDF, JPG, PNG, WEBP)</label>
+          <input type="file" id="f_files" multiple accept=".pdf,.jpg,.jpeg,.png,.webp">
+          <span class="hint">Mis. surat keterangan pindah, surat sanggup menerima, kartu keluarga. Maks. 15 MB per berkas.</span>
+        </div>
+        <div class="arsip-list" id="formFiles" style="border:1px solid var(--line);border-radius:8px;margin-top:10px"></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost left" id="btnFormDelete">Hapus</button>
+        <button type="button" class="btn btn-ghost" data-close>Batal</button>
+        <button type="submit" class="btn btn-primary" id="btnFormSave">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: DETAIL ============ -->
+<div class="modal-backdrop hidden" id="modalDetail">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 id="detailTitle">Detail Mutasi</h3>
+        <p id="detailSub"></p>
+      </div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost left" id="btnDetailPrint">Cetak Surat</button>
+      <button class="btn btn-ghost" data-close>Tutup</button>
+      <button class="btn btn-primary" id="btnDetailEdit">Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: IMPORT ============ -->
+<div class="modal-backdrop hidden" id="modalImport">
+  <div class="modal lg">
+    <div class="modal-head">
+      <div>
+        <h3>Import Data dari Excel</h3>
+        <p>Pilih berkas, periksa hasil pembacaan, lalu impor ke server.</p>
+      </div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field full" style="margin-bottom:16px">
+        <label for="importFile">Berkas Excel (.xls / .xlsx / .csv)</label>
+        <input type="file" id="importFile" accept=".xls,.xlsx,.csv">
+      </div>
+      <div id="importResult"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="left" id="importSummary" style="font-size:12.5px;color:var(--ink-500)"></span>
+      <button class="btn btn-ghost" data-close>Batal</button>
+      <button class="btn btn-primary" id="btnDoImport" disabled>Impor Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: PENGGUNA ============ -->
+<div class="modal-backdrop hidden" id="modalUser">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div>
+        <h3 id="userModalTitle">Tambah Pengguna</h3>
+        <p id="userModalSub">Buat akun untuk petugas sekolah</p>
+      </div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <form id="userForm" novalidate>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="u_username">Nama Pengguna <span class="req">*</span></label>
+            <input id="u_username" autocomplete="off">
+            <span class="err">3-32 karakter (huruf, angka, . _ -).</span>
+          </div>
+          <div class="field full">
+            <label for="u_nama">Nama Lengkap</label>
+            <input id="u_nama" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="u_role">Peran <span class="req">*</span></label>
+            <select id="u_role">
+              <option value="operator">Operator</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="u_isActive">Status</label>
+            <select id="u_isActive">
+              <option value="1">Aktif</option>
+              <option value="0">Nonaktif</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="u_password">Sandi <span class="req" id="u_passReq">*</span></label>
+            <input id="u_password" type="password" autocomplete="new-password">
+            <span class="hint" id="u_passHint">Minimal 8 karakter.</span>
+            <span class="err">Sandi minimal 8 karakter.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost left" id="btnUserDelete">Hapus</button>
+        <button type="button" class="btn btn-ghost" data-close>Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: GANTI SANDI ============ -->
+<div class="modal-backdrop hidden" id="modalPassword">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div><h3>Ganti Sandi</h3><p>Sesi lain akan otomatis diakhiri</p></div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <form id="passwordForm" novalidate>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="pw_current">Sandi Saat Ini <span class="req">*</span></label>
+            <input id="pw_current" type="password" autocomplete="current-password">
+            <span class="err">Wajib diisi.</span>
+          </div>
+          <div class="field full">
+            <label for="pw_new">Sandi Baru <span class="req">*</span></label>
+            <input id="pw_new" type="password" autocomplete="new-password">
+            <span class="hint">Minimal 8 karakter.</span>
+            <span class="err">Minimal 8 karakter.</span>
+          </div>
+          <div class="field full">
+            <label for="pw_confirm">Ulangi Sandi Baru <span class="req">*</span></label>
+            <input id="pw_confirm" type="password" autocomplete="new-password">
+            <span class="err">Sandi tidak sama.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Batal</button>
+        <button type="submit" class="btn btn-primary">Simpan Sandi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: PULIHKAN CADANGAN ============ -->
+<div class="modal-backdrop hidden" id="modalRestore">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div><h3>Pulihkan Cadangan</h3><p>Format berkas JSON dari menu Unduh Cadangan</p></div>
+      <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <form id="restoreForm" novalidate>
+      <div class="modal-body">
+        <div class="field full">
+          <label for="restoreFile">Berkas Cadangan (.json)</label>
+          <input type="file" id="restoreFile" accept=".json">
+        </div>
+        <div class="alert-box hidden" id="restoreInfo"></div>
+        <div class="field full" style="flex-direction:row;align-items:flex-start;gap:10px;margin-top:14px">
+          <input type="checkbox" id="restoreReplace" checked style="width:17px;height:17px;margin-top:2px;flex:0 0 17px">
+          <label for="restoreReplace" style="font-weight:600;cursor:pointer">
+            Kosongkan data mutasi yang ada sebelum memulihkan
+            <span class="hint" style="display:block;font-weight:400;margin-top:3px">
+              Disarankan saat pindah server agar tidak tercampur. Bila tidak dicentang,
+              data dari cadangan hanya akan ditambahkan dan baris yang sama dilewati.
+            </span>
+          </label>
+        </div>
+        <p class="hint" style="font-size:12.5px;color:var(--ink-500);margin-top:12px">
+          Berkas lampiran (surat pindai) <b>tidak</b> termasuk dalam cadangan JSON —
+          pindahkan melalui cadangan volume Docker sesuai <b>DEPLOY.md</b>.
+        </p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-close>Batal</button>
+        <button type="submit" class="btn btn-primary" id="btnRestoreGo" disabled>Pulihkan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: KONFIRMASI ============ -->
+<div class="modal-backdrop hidden" id="modalConfirm">
+  <div class="modal sm">
+    <div class="modal-head">
+      <div><h3 id="confirmTitle">Konfirmasi</h3><p id="confirmSub"></p></div>
+    </div>
+    <div class="modal-body"><p id="confirmMsg" style="font-size:13.5px;color:var(--ink-700)"></p></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close>Batal</button>
+      <button class="btn btn-danger" id="btnConfirmOk">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div id="toasts"></div>
+
+<datalist id="listKelas"></datalist>
+<datalist id="listAlasan"></datalist>
+
+<script src="/vendor/xlsx.full.min.js"></script>
+<script src="/assets/admin.js"></script>
+</body>
+</html>
