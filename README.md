@@ -34,7 +34,7 @@ Data siswa **tidak pernah tampil ke publik** — hanya dapat diakses setelah log
 | Pengaturan | **Kop surat dari gambar unggahan** (PNG/JPG, tampil sebagai pratinjau) atau disusun dari teks + dua logo; identitas sekolah, prosedur mutasi (mengubah isi halaman publik), referensi kelas/alasan, tahun ajaran |
 | Pengguna | Kelola akun petugas (admin/operator) — khusus admin |
 | Log Aktivitas | Riwayat semua tindakan penting — khusus admin |
-| Data & Cadangan | Unduh cadangan JSON, pulihkan cadangan (opsi mengganti seluruh data), hapus semua data mutasi |
+| Data & Cadangan | Unduh **cadangan lengkap ZIP** (data mutasi + pengaturan + seluruh berkas lampiran), pulihkan cadangan (opsi mengganti seluruh data), hapus semua data mutasi |
 
 ### Peran pengguna
 | Peran | Hak akses |
@@ -94,6 +94,7 @@ npm start                   # http://localhost:3000
 | `SESSION_HOURS` | `12` | Lama sesi login (jam). |
 | `COOKIE_SECURE` | `auto` | `auto` (ikut protokol), `always`, atau `never`. |
 | `MAX_UPLOAD_MB` | `15` | Batas ukuran satu berkas lampiran. |
+| `MAX_BACKUP_MB` | `1024` | Batas ukuran berkas cadangan ZIP yang dipulihkan. |
 | `SEED_SAMPLE_DATA` | `true` | Memuat 7 data contoh saat basis data masih kosong. |
 
 ---
@@ -106,7 +107,8 @@ Seluruh data berada pada satu volume Docker (`simutasi-data`):
 /data
 ├── simutasi.db          basis data SQLite (data mutasi, pengguna, pengaturan, log)
 ├── simutasi.db-wal      berkas sementara SQLite (mode WAL)
-└── files/               berkas lampiran (PDF/JPG/PNG/WEBP)
+├── files/               berkas lampiran (PDF/JPG/PNG/WEBP)
+└── tmp/                 berkas sementara saat memulihkan cadangan
 ```
 
 - **Aman saat restart** — data tidak hilang ketika container dijalankan ulang.
@@ -115,13 +117,16 @@ Seluruh data berada pada satu volume Docker (`simutasi-data`):
   `.db`, `.db-wal`, dan `.db-shm` (lihat DEPLOY.md).
 
 ### Cadangan
-1. **Cadangan penuh (disarankan)** — basis data + seluruh berkas lampiran.
-   Perintahnya ada di [DEPLOY.md](DEPLOY.md) bagian *Backup & Restore*.
-2. **Cadangan logis cepat** — login sebagai admin → Pengaturan → tab
-   **Data & Cadangan** → *Unduh Cadangan (JSON)*. Memuat data mutasi, pengaturan
-   sekolah, dan prosedur (tanpa berkas lampiran). Saat memulihkan, tersedia opsi
-   **mengosongkan data lama lebih dulu** — berguna ketika pindah server agar
-   tidak tercampur dengan data contoh.
+1. **Cadangan penuh dari aplikasi (disarankan)** — login sebagai admin →
+   Pengaturan → tab **Data & Cadangan** → *Unduh Cadangan Lengkap (ZIP)*.
+   Satu berkas `.zip` memuat seluruh data mutasi, pengaturan sekolah, prosedur,
+   **beserta semua berkas lampiran/surat**. Pulihkan melalui *Pulihkan Cadangan*;
+   centang **"Kosongkan data mutasi yang ada"** untuk mengganti data dan berkas
+   lama sekaligus (berguna saat pindah server). Cadangan `.json` lama tetap
+   dapat dipulihkan (tanpa berkas lampiran).
+2. **Cadangan level volume (alternatif via terminal)** — basis data + seluruh
+   berkas lampiran. Perintahnya ada di [DEPLOY.md](DEPLOY.md) bagian
+   *Backup & Restore*.
 
 ---
 
@@ -149,6 +154,8 @@ Semua alamat di bawah `/api` memerlukan login, kecuali yang ditandai publik.
 | `GET` | `/api/settings/audit` | Log aktivitas |
 | `GET/POST` | `/api/users` | Daftar / tambah pengguna (admin) |
 | `PUT/DELETE` | `/api/users/:id` | Ubah / hapus pengguna (admin) |
+| `GET` | `/api/backup/download` | Unduh cadangan lengkap ZIP — data + berkas (admin) |
+| `POST` | `/api/backup/restore` | Pulihkan cadangan (`.zip`/`.json`, multipart) (admin) |
 
 ---
 

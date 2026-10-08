@@ -19,7 +19,11 @@ module.exports = {
   port: int(process.env.PORT, 3000),
   dataDir,
   filesDir: path.join(dataDir, 'files'),
+  tmpDir: path.join(dataDir, 'tmp'),
   dbFile: process.env.DB_FILE || path.join(dataDir, 'simutasi.db'),
+
+  // Cadangan lengkap (ZIP: data + berkas lampiran)
+  maxBackupMb: int(process.env.MAX_BACKUP_MB, 1024),
 
   // Sesi login
   sessionHours: int(process.env.SESSION_HOURS, 12),

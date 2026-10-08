@@ -232,15 +232,27 @@ docker run --rm --network container:simutasi-app \
   node backup-drill.js verify http://127.0.0.1:3000 admin '<sandi-admin>'
 ```
 
-### 5.5 Cadangan logis cepat (data saja)
+### 5.5 Cadangan lengkap dari dalam aplikasi (ZIP)
 
-Login sebagai admin → **Pengaturan → Data & Cadangan → Unduh Cadangan (JSON)**.
-Cocok untuk memindahkan data antar sekolah atau memulihkan sebagian data.
+Login sebagai admin → **Pengaturan → Data & Cadangan → Unduh Cadangan Lengkap
+(ZIP)**. Menghasilkan satu berkas `simutasi-cadangan-YYYY-MM-DD.zip` yang berisi:
 
-- Opsi **"Kosongkan data mutasi yang ada sebelum memulihkan"** berguna saat
-  pindah server agar data baru tidak tercampur dengan data contoh.
-- Berkas lampiran **tidak** termasuk dalam cadangan JSON — pindahkan melalui
-  cadangan volume (§5.1) atau unggah ulang.
+```
+backup.json      data mutasi + pengaturan sekolah + prosedur
+files/           seluruh berkas lampiran/surat yang diunggah
+```
+
+Cocok untuk memindahkan seluruh arsip antar sekolah/server tanpa akses terminal.
+Pulihkan melalui **Pulihkan Cadangan** (unggah berkas `.zip`):
+
+- Centang **"Kosongkan data mutasi yang ada sebelum memulihkan"** untuk
+  mengganti seluruh data **dan berkas** dengan isi cadangan (disarankan saat
+  pindah server agar tidak tercampur).
+- Tanpa centang, data/berkas hanya ditambahkan dan baris yang sama dilewati.
+
+Berkas `.json` cadangan versi lama tetap dapat dipulihkan, tetapi hanya memuat
+data (tanpa berkas lampiran). Batas ukuran unggahan cadangan diatur oleh
+`MAX_BACKUP_MB` (bawaan 1024 MB).
 
 ---
 
@@ -361,7 +373,7 @@ console.log('Akun admin siap:', process.argv[1]);
 > Sandi admin yang berlaku setelah pemulihan adalah sandi dari server lama.
 > Bila lupa, ikuti *Reset Akun Admin* pada §9.
 
-**Alternatif tanpa berkas lampiran:** cukup gunakan cadangan JSON (§5.5) —
-login di server baru, lalu **Pengaturan → Data & Cadangan → Pulihkan Cadangan**
-dengan opsi *"Kosongkan data mutasi yang ada"* tetap dicentang. Cara ini paling
-cepat, tetapi berkas surat pindai harus diunggah ulang.
+**Alternatif tanpa akses terminal:** gunakan cadangan ZIP dari dalam aplikasi
+(§5.5) — login di server baru, lalu **Pengaturan → Data & Cadangan → Pulihkan
+Cadangan** dengan berkas `.zip` dan opsi *"Kosongkan data mutasi yang ada"*
+tetap dicentang. Cara ini ikut memindahkan seluruh berkas surat pindai.

@@ -1571,89 +1571,66 @@
     toast('Berkas Excel berhasil dibuat.');
   }
 
-  function dumpJson() {
-    var payload = {
-      app: 'SIMUTASI', version: 2, exportedAt: new Date().toISOString(),
-      profil: state.profil, prosedur: state.prosedur,
-      records: state.records.map(function (r) {
-        return {
-          jenis: r.jenis, tanggal: r.tanggal, nomorSurat: r.nomorSurat, nis: r.nis, nisn: r.nisn, nama: r.nama,
-          jenisKelamin: r.jenisKelamin, kelas: r.kelas, tempatLahir: r.tempatLahir,
-          tanggalLahir: r.tanggalLahir, namaOrtu: r.namaOrtu, asalSekolah: r.asalSekolah,
-          tujuan: r.tujuan, alasan: r.alasan, keterangan: r.keterangan, tahunAjaran: r.tahunAjaran
-        };
-      })
-    };
-    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  function downloadBackup() {
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'simutasi-cadangan-' + todayIso() + '.json';
+    a.href = '/api/backup/download';
+    a.download = 'simutasi-cadangan-' + todayIso() + '.zip';
     document.body.appendChild(a); a.click(); a.remove();
-    toast('Cadangan JSON berhasil diunduh.');
+    toast('Mengunduh cadangan lengkap (ZIP)…');
   }
 
   var restorePayload = null;
 
   function handleRestoreFile(file) {
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var info = $('#restoreInfo');
-      try {
-        var data = JSON.parse(e.target.result);
-        if (!data || !Array.isArray(data.records)) throw new Error('Format berkas tidak sesuai.');
-        restorePayload = data;
-        var total = data.records.length;
-        var usable = data.records.filter(function (r) { return r.nama && r.nisn; }).length;
-        var dropped = total - usable;
-        info.className = 'alert-box success';
-        info.innerHTML = 'Berkas terbaca: <b>' + total + '</b> data' +
-          (dropped ? ' · <b>' + dropped + ' tidak lengkap</b> (tanpa nama/NISN, akan dilewati)' : '') +
-          (data.profil ? ' · pengaturan sekolah tersedia' : '');
-        $('#btnRestoreGo').disabled = false;
-      } catch (err) {
-        restorePayload = null;
-        info.className = 'alert-box error';
-        info.textContent = 'Gagal membaca cadangan: ' + err.message;
-        $('#btnRestoreGo').disabled = true;
-      }
-    };
-    reader.readAsText(file);
+    var info = $('#restoreInfo');
+    if (!/\.(zip|json)$/i.test(file.name)) {
+      restorePayload = null;
+      info.className = 'alert-box error';
+      info.textContent = 'Format berkas harus .zip (atau .json untuk cadangan lama).';
+      $('#btnRestoreGo').disabled = true;
+      return;
+    }
+    restorePayload = file;
+    var legacy = /\.json$/i.test(file.name);
+    info.className = 'alert-box success';
+    info.innerHTML = 'Berkas siap dipulihkan: <b>' + esc(file.name) + '</b> (' + fmtBerkas(file.size) + ')' +
+      (legacy
+        ? ' · cadangan lama (data saja, tanpa berkas lampiran).'
+        : ' · termasuk data mutasi, pengaturan, dan seluruh berkas lampiran.');
+    $('#btnRestoreGo').disabled = false;
   }
 
   function runRestore() {
     if (!restorePayload) return;
     var btn = $('#btnRestoreGo');
     var replace = !!($('#restoreReplace') && $('#restoreReplace').checked);
+    var fd = new FormData();
+    fd.append('file', restorePayload, restorePayload.name);
+    fd.append('replace', replace ? '1' : '0');
     btn.disabled = true;
     btn.innerHTML = '<span class="spin"></span> Memulihkan…';
 
-    var records = restorePayload.records.filter(function (r) { return r.nama && r.nisn; });
-    var result = { added: 0, skipped: 0 };
-    var chain = Promise.resolve();
-
-    if (replace) chain = chain.then(function () { return api('DELETE', '/api/records/all'); });
-    if (records.length) {
-      chain = chain.then(function () { return api('POST', '/api/records/bulk', { records: records }); })
-        .then(function (res) { result = res; });
-    }
-    chain.then(function () {
-      if (restorePayload.profil && isAdmin()) {
-        return api('PUT', '/api/settings', { profil: restorePayload.profil, prosedur: restorePayload.prosedur })
-          .then(function (s) { state.profil = s.profil; state.prosedur = s.prosedur; });
-      }
-    }).then(function () {
+    api('POST', '/api/backup/restore', fd).then(function (res) {
       closeModal('modalRestore');
       restorePayload = null;
       $('#restoreFile').value = '';
       $('#restoreInfo').className = 'alert-box hidden';
       btn.disabled = true;
       btn.textContent = 'Pulihkan';
-      return reloadRecords().then(function () {
-        renderAll();
-        var msg = (result.added || 0) + ' data dipulihkan';
-        if (result.skipped) msg += ', ' + result.skipped + ' dilewati (duplikat)';
-        if (result.invalid) msg += ', ' + result.invalid + ' tidak valid';
-        toast(msg + '.');
+
+      var syncSettings = isAdmin()
+        ? api('GET', '/api/settings').then(function (s) { state.profil = s.profil; state.prosedur = s.prosedur; })
+        : Promise.resolve();
+
+      return syncSettings.then(function () {
+        return reloadRecords().then(function () {
+          renderAll();
+          var msg = (res.records || 0) + ' data dipulihkan';
+          if (res.attachments) msg += ', ' + res.attachments + ' berkas';
+          if (res.skipped) msg += ', ' + res.skipped + ' dilewati (duplikat/tidak valid)';
+          if (res.missingFiles) msg += ', ' + res.missingFiles + ' berkas hilang dari arsip';
+          toast(msg + '.');
+        });
       });
     }).catch(function (err) {
       btn.disabled = false;
@@ -1976,7 +1953,7 @@
     $('#btnRefreshAudit').addEventListener('click', loadAudit);
 
     // data & cadangan
-    $('#btnDump').addEventListener('click', dumpJson);
+    $('#btnDump').addEventListener('click', downloadBackup);
     $('#btnRestore').addEventListener('click', function () {
       restorePayload = null;
       $('#restoreFile').value = '';

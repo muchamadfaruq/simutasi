@@ -11,8 +11,10 @@
     "start": "node server/index.js"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "better-sqlite3": "^11.10.0",
     "express": "^4.21.2",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "unzipper": "^0.12.5"
   }
 }

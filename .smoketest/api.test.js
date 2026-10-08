@@ -459,6 +459,40 @@ function makeSession() {
   const opAudit = await operator.get('/api/settings/audit');
   check('operator tetap boleh melihat log', opAudit.status === 200, opAudit.status);
 
+  /* ---------------------------------------------------- cadangan ZIP */
+  section('Cadangan lengkap (ZIP) & pemulihan');
+  const bkAnon = await anon.get('/api/backup/download');
+  check('cadangan ditolak tanpa login (401)', bkAnon.status === 401, bkAnon.status);
+  const bkOp = await operator.get('/api/backup/download');
+  check('cadangan ditolak untuk operator (403)', bkOp.status === 403, bkOp.status);
+
+  const bkDl = await fetch(BASE + '/api/backup/download', { headers: { Cookie: admin.cookie() } });
+  const zipBuf = new Uint8Array(await bkDl.arrayBuffer());
+  check('unduh cadangan ZIP berhasil', bkDl.status === 200, bkDl.status);
+  check('jenis konten arsip', bkDl.headers.get('content-type') === 'application/zip', bkDl.headers.get('content-type'));
+  check('nama berkas cadangan .zip', /\.zip/.test(bkDl.headers.get('content-disposition') || ''), bkDl.headers.get('content-disposition'));
+  check('isi arsip berupa ZIP', zipBuf.length > 4 && zipBuf[0] === 0x50 && zipBuf[1] === 0x4b, 'byte0=' + zipBuf[0]);
+
+  await admin.del('/api/records/all');
+  const attGone = await fetch(BASE + '/api/attachments/' + attId + '/raw', { headers: { Cookie: admin.cookie() } });
+  check('berkas hilang setelah data dikosongkan', attGone.status === 404, attGone.status);
+
+  const rfd = new FormData();
+  rfd.append('file', new Blob([zipBuf], { type: 'application/zip' }), 'cadangan.zip');
+  rfd.append('replace', '1');
+  const restore = await admin.req('POST', '/api/backup/restore', rfd, true);
+  check('pemulihan cadangan berhasil', restore.status === 200, restore.status + ' ' + restore.text.slice(0, 160));
+  check('berkas lampiran ikut dipulihkan', restore.json && restore.json.attachments >= 1, JSON.stringify(restore.json));
+
+  const attBack = await fetch(BASE + '/api/attachments/' + attId + '/raw', { headers: { Cookie: admin.cookie() } });
+  const attBackBuf = new Uint8Array(await attBack.arrayBuffer());
+  check('berkas dapat dibuka kembali setelah pemulihan', attBack.status === 200, attBack.status);
+  check('isi berkas pulih sama persis', attBackBuf.length === pdfBytes.length && attBackBuf[0] === 0x25, 'panjang=' + attBackBuf.length);
+  const restoreAudit = await admin.get('/api/settings/audit?limit=20');
+  const restoreActions = restoreAudit.json.audit.map((a) => a.action);
+  check('log mencatat unduh cadangan', restoreActions.indexOf('unduh-cadangan') > -1);
+  check('log mencatat pemulihan cadangan', restoreActions.indexOf('pulihkan-cadangan') > -1);
+
   /* ---------------------------------------------------- hapus */
   section('Hapus data');
   const delAtt = await admin.del('/api/attachments/' + attId);

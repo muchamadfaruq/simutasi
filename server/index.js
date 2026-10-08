@@ -14,6 +14,7 @@ const recordsRoutes = require('./routes/records');
 const filesRoutes = require('./routes/files');
 const settingsRoutes = require('./routes/settings');
 const usersRoutes = require('./routes/users');
+const backupRoutes = require('./routes/backup');
 
 // Siapkan pengaturan, akun admin pertama, dan data contoh bila perlu.
 seed.run();
@@ -92,6 +93,7 @@ app.use('/api/records', recordsRoutes);
 app.use('/api/attachments', filesRoutes.router);
 app.use('/api/settings', settingsRoutes.router);
 app.use('/api/users', auth.requireRole('admin'), usersRoutes);
+app.use('/api/backup', auth.requireRole('admin'), backupRoutes);
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'Alamat API tidak ditemukan.' }));
 
@@ -121,7 +123,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   const isApi = auth.isApiRequest(req);
   if (err && (err.code === 'LIMIT_FILE_SIZE' || err.code === 'LIMIT_FILE_COUNT')) {
-    const message = 'Ukuran berkas melebihi batas ' + config.maxUploadMb + ' MB.';
+    const isBackup = /^\/api\/backup\//.test(req.originalUrl || '');
+    const limitMb = isBackup ? config.maxBackupMb : config.maxUploadMb;
+    const message = 'Ukuran berkas melebihi batas ' + limitMb + ' MB.';
     return isApi ? res.status(413).json({ error: message }) : res.status(413).send(message);
   }
   if (err && err.type === 'entity.too.large') {

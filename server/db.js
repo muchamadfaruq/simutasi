@@ -289,7 +289,10 @@ const records = {
          tanggal_lahir, nama_ortu, asal_sekolah, tujuan, alasan, keterangan, tahun_ajaran, created_at, updated_at)
        VALUES (@id, @jenis, @tanggal, @nomorSurat, @nis, @nisn, @nama, @jenisKelamin, @kelas, @tempatLahir,
          @tanggalLahir, @namaOrtu, @asalSekolah, @tujuan, @alasan, @keterangan, @tahunAjaran, @createdAt, @updatedAt)`
-    ).run(Object.assign({}, r, { createdAt: at, updatedAt: at }));
+    ).run(Object.assign({}, r, {
+      createdAt: (typeof data.createdAt === 'string' && data.createdAt) ? data.createdAt : at,
+      updatedAt: (typeof data.updatedAt === 'string' && data.updatedAt) ? data.updatedAt : at
+    }));
     return this.get(r.id);
   },
   update(id, data) {
@@ -369,6 +372,10 @@ const attachments = {
   get(id) {
     return db.prepare('SELECT * FROM attachments WHERE id = ?').get(id) || null;
   },
+  /** Seluruh baris mentah (snake_case) untuk cadangan lengkap. */
+  listAllRaw() {
+    return db.prepare('SELECT * FROM attachments ORDER BY created_at').all();
+  },
   counts() {
     const rows = db.prepare('SELECT record_id, COUNT(*) AS n FROM attachments GROUP BY record_id').all();
     const map = {};
@@ -379,7 +386,7 @@ const attachments = {
     db.prepare(
       `INSERT INTO attachments (id, record_id, name, mime, size, stored_name, created_at, uploaded_by)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(a.id, a.recordId, a.name, a.mime, a.size, a.storedName, nowIso(), a.uploadedBy || null);
+    ).run(a.id, a.recordId, a.name, a.mime, a.size, a.storedName, a.createdAt || nowIso(), a.uploadedBy || null);
     return mapAttachment(this.get(a.id));
   },
   remove(id) {

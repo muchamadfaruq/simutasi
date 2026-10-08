@@ -30,8 +30,17 @@ async function waitFor(fn, timeout) {
 }
 
 /* ---------- jembatan fetch: jsdom -> fetch Node + cookie ---------- */
+function readJsdomBlob(win, blob) {
+  return new Promise((resolve, reject) => {
+    const fr = new win.FileReader();
+    fr.onload = () => resolve(Buffer.from(fr.result));
+    fr.onerror = () => reject(fr.error || new Error('gagal membaca berkas'));
+    fr.readAsArrayBuffer(blob);
+  });
+}
+
 function installFetch(window, jar) {
-  window.fetch = function (input, init) {
+  window.fetch = async function (input, init) {
     const opts = init || {};
     const rawUrl = typeof input === 'string' ? input : (input && input.url) || String(input);
     const url = new window.URL(rawUrl, BASE).href;
@@ -43,18 +52,35 @@ function installFetch(window, jar) {
     }
     const cookie = jar.getCookieStringSync(url);
     if (cookie) headers.Cookie = cookie;
-    return fetch(url, {
+
+    let body = opts.body;
+    if (body && typeof body === 'object' && typeof body.append === 'function' &&
+        typeof body.entries === 'function' && !(body instanceof Buffer)) {
+      const converted = new FormData();
+      for (const pair of body.entries()) {
+        const key = pair[0];
+        const val = pair[1];
+        if (val && typeof val === 'object' && typeof val.size === 'number' && typeof val.slice === 'function') {
+          const buf = await readJsdomBlob(window, val);
+          converted.append(key, new Blob([buf], { type: val.type || 'application/octet-stream' }), val.name || key);
+        } else {
+          converted.append(key, val);
+        }
+      }
+      body = converted;
+    }
+
+    const res = await fetch(url, {
       method: opts.method || 'GET',
       headers: headers,
-      body: opts.body,
+      body: body,
       redirect: 'manual'
-    }).then((res) => {
-      const list = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [];
-      list.forEach((line) => {
-        try { jar.setCookieSync(line, url); } catch (e) { /* abaikan */ }
-      });
-      return res;
     });
+    const list = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [];
+    list.forEach((line) => {
+      try { jar.setCookieSync(line, url); } catch (e) { /* abaikan */ }
+    });
+    return res;
   };
 }
 
@@ -497,8 +523,9 @@ async function nodeLogin(username, password) {
   restoreInput.dispatchEvent(new win.Event('change', { bubbles: true }));
   const okRead = await waitFor(() => !$(doc, '#btnRestoreGo').disabled, 3000);
   check('berkas cadangan terbaca', okRead);
-  check('ringkasan cadangan ditampilkan', /4 data/.test($(doc, '#restoreInfo').textContent), $(doc, '#restoreInfo').textContent);
-  check('baris tidak lengkap diberitahukan', /tidak lengkap/i.test($(doc, '#restoreInfo').textContent), $(doc, '#restoreInfo').textContent);
+  check('nama berkas cadangan ditampilkan', /cadangan-uji\.json/.test($(doc, '#restoreInfo').textContent), $(doc, '#restoreInfo').textContent);
+  check('cadangan lama ditandai data saja', /cadangan lama/i.test($(doc, '#restoreInfo').textContent), $(doc, '#restoreInfo').textContent);
+  check('input menerima berkas zip', /\.zip/.test($(doc, '#restoreFile').getAttribute('accept')), $(doc, '#restoreFile').getAttribute('accept'));
 
   submit(win, $(doc, '#restoreForm'));
   const okRestore = await waitFor(() => /SMA HASIL PEMULIHAN/.test($(doc, '#brandSchool').textContent), 8000);

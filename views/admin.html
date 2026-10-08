@@ -512,14 +512,14 @@
           <div class="card-head"><h3>Data &amp; Cadangan</h3></div>
           <div class="card-body">
             <div class="data-actions">
-              <button class="btn btn-ghost btn-sm" id="btnDump">Unduh Cadangan (JSON)</button>
+              <button class="btn btn-ghost btn-sm" id="btnDump">Unduh Cadangan Lengkap (ZIP)</button>
               <button class="btn btn-ghost btn-sm" id="btnRestore">Pulihkan Cadangan</button>
               <button class="btn btn-danger btn-sm" id="btnPurge">Hapus Semua Data Mutasi</button>
             </div>
             <p class="hint" style="margin-top:12px;font-size:12.5px;color:var(--ink-500)">
-              Cadangan JSON memuat seluruh data mutasi, pengaturan sekolah, dan prosedur.
-              Berkas lampiran tidak termasuk — simpan berkas aslinya secara terpisah atau cadangkan
-              volume Docker (lihat <b>DEPLOY.md</b>).
+              Cadangan ZIP memuat seluruh data mutasi, pengaturan sekolah, prosedur,
+              <b>beserta semua berkas lampiran/surat</b> yang diunggah. Simpan berkas
+              cadangan di tempat aman dan terpisah dari server.
             </p>
           </div>
         </div>
@@ -781,14 +781,14 @@
 <div class="modal-backdrop hidden" id="modalRestore">
   <div class="modal sm">
     <div class="modal-head">
-      <div><h3>Pulihkan Cadangan</h3><p>Format berkas JSON dari menu Unduh Cadangan</p></div>
+      <div><h3>Pulihkan Cadangan</h3><p>Berkas ZIP dari menu Unduh Cadangan</p></div>
       <button class="btn btn-icon close" data-close><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
     <form id="restoreForm" novalidate>
       <div class="modal-body">
         <div class="field full">
-          <label for="restoreFile">Berkas Cadangan (.json)</label>
-          <input type="file" id="restoreFile" accept=".json">
+          <label for="restoreFile">Berkas Cadangan (.zip)</label>
+          <input type="file" id="restoreFile" accept=".zip,.json">
         </div>
         <div class="alert-box hidden" id="restoreInfo"></div>
         <div class="field full" style="flex-direction:row;align-items:flex-start;gap:10px;margin-top:14px">
@@ -802,8 +802,9 @@
           </label>
         </div>
         <p class="hint" style="font-size:12.5px;color:var(--ink-500);margin-top:12px">
-          Berkas lampiran (surat pindai) <b>tidak</b> termasuk dalam cadangan JSON —
-          pindahkan melalui cadangan volume Docker sesuai <b>DEPLOY.md</b>.
+          Cadangan ZIP memuat data mutasi, pengaturan sekolah, dan seluruh
+          berkas lampiran/surat. Bila opsi di atas dicentang, data dan berkas lama
+          akan diganti dengan isi cadangan.
         </p>
       </div>
       <div class="modal-foot">
